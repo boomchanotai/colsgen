@@ -1,5 +1,6 @@
 import { Container } from "@/components/common/container";
 import { Button } from "@/components/ui/button";
+import { UploadCsv } from "./upload-csv";
 
 export const Hero = () => {
   return (
@@ -18,9 +19,7 @@ export const Hero = () => {
           </p>
         </div>
         <div className="flex flex-col justify-center items-center">
-          <Button size={"lg"} className="text-2xl h-auto py-3 px-12">
-            Upload CSV
-          </Button>
+          <UploadCsv />
         </div>
         <div
           aria-hidden="true"
