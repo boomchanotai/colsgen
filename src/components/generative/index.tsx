@@ -2,10 +2,25 @@
 
 import { Container } from "@/components/common/container";
 import { useFileStore } from "@/stores/file";
-import { File, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { File } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import Papa from "papaparse";
 import { Column } from "./components/column";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "../ui/button";
 
 const limit = 100;
@@ -17,7 +32,17 @@ export const Generative = () => {
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 20;
+
+  const [promptColumns, setPromptColumns] = useState<
+    { id: string; name: string; prompt: string }[]
+  >([]);
+
+  const rowsPerPage = 20;
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const currentData = data.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage,
+  );
 
   useEffect(() => {
     if (!file) return;
@@ -51,6 +76,14 @@ export const Generative = () => {
     },
     [data],
   );
+
+  const handlePrevious = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   if (!file)
     return (
@@ -97,7 +130,52 @@ export const Generative = () => {
       {/* Body */}
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-8 border border-primary rounded-md px-6 py-4">
-          s
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {headers.map((header) => (
+                  <TableHead key={header}>{header}</TableHead>
+                ))}
+                {promptColumns.map((col) => (
+                  <TableHead key={col.id}>{col.name}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((row, rowIdx) => (
+                <TableRow key={rowIdx}>
+                  {headers.map((header) => (
+                    <TableCell key={header}>{row[header]}</TableCell>
+                  ))}
+                  {promptColumns.map((col) => (
+                    <TableCell key={col.id}>
+                      <pre>{row[col.id] || "-"}</pre>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <Pagination className="mt-4 justify-center">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={handlePrevious}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+              <PaginationItem className="px-4 py-2 text-xs">
+                Page {currentPage} of {totalPages}
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={handleNext}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
         <div className="col-span-4 border border-primary rounded-md px-6 py-4">
           s
