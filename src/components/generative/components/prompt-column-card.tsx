@@ -43,12 +43,7 @@ export const PromptColumnCard = (props: PromptColumnCardProps) => {
         required
       />
       <div className="flex justify-end">
-        <Button
-          type="submit"
-          className="gap-2"
-          disabled={isGenerating}
-          onClick={() => handleGenerateColumn(col)}
-        >
+        <Button type="submit" className="gap-2" disabled={isGenerating}>
           Generate Column
         </Button>
       </div>

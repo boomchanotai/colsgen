@@ -218,8 +218,8 @@ export const Generative = () => {
       </div>
 
       {/* Body */}
-      <div className="grid grid-cols-12 gap-8">
-        <div className="relative col-span-8">
+      <div className="flex gap-8">
+        <div className="relative flex-1 overflow-hidden">
           <DataTable
             data={data}
             headers={headers}
@@ -232,10 +232,9 @@ export const Generative = () => {
           )}
         </div>
 
-        <div className="col-span-4 flex flex-col gap-4">
+        <div className="flex min-w-80 flex-initial flex-col gap-4">
           {apiKey !== "" ? (
             <>
-              {" "}
               <div className="flex justify-end">
                 <AddColumnDialog
                   setPromptColumns={setPromptColumns}
