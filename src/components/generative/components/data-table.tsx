@@ -1,8 +1,9 @@
 import { useState } from "react"
 
 import { PromptColumn } from "@/types"
-import { Sparkles } from "lucide-react"
+import { Sparkles, X } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import {
   Pagination,
   PaginationContent,
@@ -23,10 +24,11 @@ interface DataTableProps {
   data: any[]
   headers: string[]
   promptColumns: PromptColumn[]
+  handleRemoveColumn: (id: string) => void
 }
 
 export const DataTable = (props: DataTableProps) => {
-  const { data, headers, promptColumns } = props
+  const { data, headers, promptColumns, handleRemoveColumn } = props
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -56,7 +58,17 @@ export const DataTable = (props: DataTableProps) => {
                   key={header}
                   className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
                 >
-                  {header}
+                  <div className="flex items-center gap-2">
+                    <p>{header}</p>
+                    <Button
+                      size="icon"
+                      className="size-auto rounded"
+                      variant="ghost"
+                      onClick={() => handleRemoveColumn(header)}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
                 </TableHead>
               ))}
               {promptColumns.map((col) => (
@@ -67,6 +79,14 @@ export const DataTable = (props: DataTableProps) => {
                   <div className="flex items-center gap-2">
                     <span>{col.name}</span>
                     <Sparkles className="text-primary size-4" />
+                    <Button
+                      size="icon"
+                      className="size-auto rounded"
+                      variant="ghost"
+                      onClick={() => handleRemoveColumn(col.id)}
+                    >
+                      <X className="size-4" />
+                    </Button>
                   </div>
                 </TableHead>
               ))}

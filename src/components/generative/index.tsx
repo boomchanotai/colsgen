@@ -53,22 +53,21 @@ export const Generative = () => {
     })
   }, [file])
 
-  const handleRemoveColumn = useCallback(
-    (colToRemove: string) => {
-      // Remove column header
-      const updatedHeaders = headers.filter((h) => h !== colToRemove)
-      setHeaders(updatedHeaders)
+  const handleRemoveColumn = (colToRemove: string) => {
+    // Remove from headers
+    setHeaders((prev) => prev.filter((h) => h !== colToRemove))
 
-      // Remove column data from each row
-      const updatedData = data.map((row) => {
-        const newRow = { ...row }
-        delete newRow[colToRemove]
-        return newRow
+    // Remove from promptColumns (if exists)
+    setPromptColumns((prev) => prev.filter((col) => col.id !== colToRemove))
+
+    // Remove from data rows
+    setData((prev) =>
+      prev.map((row) => {
+        const { [colToRemove]: _, ...rest } = row
+        return rest
       })
-      setData(updatedData)
-    },
-    [data]
-  )
+    )
+  }
 
   const handleCancel = () => {
     cancelRequestedRef.current = true
@@ -213,7 +212,7 @@ export const Generative = () => {
         <InformationBox
           icon={<KeyRound className="size-4" />}
           title="API Key"
-          description="Activated"
+          description={apiKey ? "Activated" : "No API Key"}
         />
       </div>
 
@@ -224,6 +223,7 @@ export const Generative = () => {
             data={data}
             headers={headers}
             promptColumns={promptColumns}
+            handleRemoveColumn={handleRemoveColumn}
           />
           {isGenerating && (
             <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80">
@@ -232,7 +232,7 @@ export const Generative = () => {
           )}
         </div>
 
-        <div className="flex min-w-80 flex-initial flex-col gap-4">
+        <div className="flex min-w-96 flex-initial flex-col gap-4">
           {apiKey !== "" ? (
             <>
               <div className="flex justify-end">
