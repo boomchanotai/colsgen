@@ -9,9 +9,8 @@ import {
   Rows3,
   Sparkles,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { SetStateAction, useCallback, useEffect, useState } from "react";
 import Papa from "papaparse";
-import { Column } from "./components/column";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,8 +21,11 @@ import { ProgressBar } from "./components/progress-bar";
 import { Heading } from "./components/heading";
 import { InformationBox } from "./components/information-box";
 import { formatBytes } from "@/lib/utils";
+import { AddColumnDialog } from "./components/add-column-dialog";
+import { PromptColumnCard } from "./components/prompt-column-card";
+import LoadingDots from "./components/animate";
 
-const limit = 100;
+const limit = 5;
 
 const API_KEY = "AIzaSyAxRz8_cMyLzPvSkhH5v4RyhEd_cPWmhYo";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
@@ -31,7 +33,6 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
 export const Generative = () => {
   const { file } = useFileStore();
 
-  const [colName, setColName] = useState("");
   const [totalRows, setTotalRows] = useState(0);
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -72,23 +73,6 @@ export const Generative = () => {
       setData(updatedData);
     },
     [data],
-  );
-
-  const handleAddColumn = useCallback(
-    (e: React.SyntheticEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      if (!colName) return;
-
-      const newColumn = {
-        id: `col_${Date.now()}`,
-        name: colName,
-        prompt: "",
-      };
-      setPromptColumns([...promptColumns, newColumn]);
-      setColName("");
-    },
-    [colName],
   );
 
   const handleGenerateColumn = async (column: {
@@ -222,59 +206,38 @@ export const Generative = () => {
 
       {/* Body */}
       <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-8">
+        <div className="relative col-span-8">
           <DataTable
             data={data}
             headers={headers}
             promptColumns={promptColumns}
           />
+          {isGenerating && (
+            <div className="absolute top-0 left-0 size-full bg-white/80 rounded-md flex justify-center items-center">
+              <LoadingDots />
+            </div>
+          )}
         </div>
-        <div className="col-span-4 flex flex-col px-6 py-4 gap-4">
-          <div className="flex-1 space-y-4">
-            {promptColumns.map((col, idx) => (
-              <div
-                key={col.id}
-                className="space-y-2 border p-2 rounded-md bg-white/50"
-              >
-                <Label>Prompt for {col.name}</Label>
-                <Input
-                  value={col.prompt}
-                  onChange={(e) => {
-                    const updated = [...promptColumns];
-                    updated[idx].prompt = e.target.value;
-                    setPromptColumns(updated);
-                  }}
-                  placeholder="prompt"
-                />
-                <Button
-                  size="sm"
-                  className="w-full gap-2"
-                  disabled={isGenerating}
-                  onClick={() => handleGenerateColumn(col)}
-                >
-                  {isGenerating && (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  )}
-                  Generate All for This Column
-                </Button>
-              </div>
+
+        <div className="col-span-4 flex flex-col gap-4">
+          <div className="flex justify-end">
+            <AddColumnDialog setPromptColumns={setPromptColumns} />
+          </div>
+
+          <div className="space-y-4">
+            {promptColumns.map((col) => (
+              <PromptColumnCard
+                col={col}
+                setPromptColumns={setPromptColumns}
+                isGenerating={isGenerating}
+                handleGenerateColumn={handleGenerateColumn}
+              />
             ))}
           </div>
-          <form className="flex gap-2 items-center" onSubmit={handleAddColumn}>
-            <Input
-              value={colName}
-              onChange={(e) => setColName(e.target.value)}
-              placeholder="Generative Column Name"
-              required
-            />
-            <Button type="submit" size="sm">
-              Add
-            </Button>
-          </form>
         </div>
       </div>
 
-      {progress && <ProgressBar progress={progress} />}
+      {progress ? <ProgressBar progress={progress} /> : null}
     </div>
   );
 };

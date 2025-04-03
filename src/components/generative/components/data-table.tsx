@@ -87,7 +87,7 @@ export const DataTable = (props: DataTableProps) => {
                 {promptColumns.map((col) => (
                   <TableCell
                     key={col.id}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-96 truncate"
                   >
                     {row[col.id] || "-"}
                   </TableCell>
