@@ -1,14 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, File, Share2 } from "lucide-react";
+import { EllipsisVertical, File, Pause, Share2 } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface HeadingProps {
   fileName: string;
   lastModified: number;
   handleExport: () => void;
+  isGenerating: boolean;
+  setCancelRequested: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Heading = (props: HeadingProps) => {
-  const { fileName, lastModified, handleExport } = props;
+  const {
+    fileName,
+    lastModified,
+    handleExport,
+    isGenerating,
+    setCancelRequested,
+  } = props;
 
   return (
     <div className="flex justify-between items-center gap-8">
@@ -32,6 +41,14 @@ export const Heading = (props: HeadingProps) => {
       </div>
 
       <div className="flex gap-2 items-center">
+        {isGenerating ? (
+          <Button
+            onClick={() => setCancelRequested(true)}
+            variant="destructive"
+          >
+            <Pause className="size-4" />
+          </Button>
+        ) : null}
         <Button onClick={handleExport}>Export as CSV</Button>
         <Button size="icon" variant="secondary">
           <EllipsisVertical className="size-4" />

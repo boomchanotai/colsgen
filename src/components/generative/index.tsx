@@ -24,6 +24,7 @@ import { formatBytes } from "@/lib/utils";
 import { AddColumnDialog } from "./components/add-column-dialog";
 import { PromptColumnCard } from "./components/prompt-column-card";
 import LoadingDots from "./components/animate";
+import { isGenerator } from "motion/react";
 
 const limit = 5;
 
@@ -36,12 +37,11 @@ export const Generative = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
-
   const [progress, setProgress] = useState<number | null>(null);
-
   const [isGenerating, setGenerating] = useState(false);
-
   const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([]);
+
+  const [cancelRequested, setCancelRequested] = useState(false);
 
   useEffect(() => {
     if (!file) return;
@@ -75,55 +75,64 @@ export const Generative = () => {
     [data],
   );
 
-  const handleGenerateColumn = async (column: {
-    id: string;
-    name: string;
-    prompt: string;
-  }) => {
-    setGenerating(true);
-    const updated = [...data];
-    const newLoading: { [key: number]: boolean } = {};
+  const handleGenerateColumn = useCallback(
+    async (column: { id: string; name: string; prompt: string }) => {
+      setGenerating(true);
+      const updated = [...data];
+      const newLoading: { [key: number]: boolean } = {};
 
-    setProgress(0);
+      setProgress(0);
 
-    for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
-      newLoading[rowIndex] = true;
+      for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+        if (cancelRequested) {
+          break;
+        }
 
-      const row = data[rowIndex];
-      const filledPrompt = column.prompt.replace(
-        /{{(.*?)}}/g,
-        (_, key) => row[key.trim()] || "",
-      );
+        const row = data[rowIndex];
 
-      try {
-        const response = await axios.post(API_URL, {
-          contents: [{ parts: [{ text: filledPrompt }] }],
-        });
+        // ✅ Skip if result already exists
+        if (row[column.id]) {
+          continue;
+        }
 
-        const result =
-          response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        updated[rowIndex] = {
-          ...updated[rowIndex],
-          [column.id]: result,
-        };
-      } catch (error) {
-        console.error(`Error generating for ${column.name}:`, error);
-        updated[rowIndex] = {
-          ...updated[rowIndex],
-          [column.id]: "[Error]",
-        };
+        newLoading[rowIndex] = true;
+
+        const filledPrompt = column.prompt.replace(
+          /{{(.*?)}}/g,
+          (_, key) => row[key.trim()] || "",
+        );
+
+        try {
+          const response = await axios.post(API_URL, {
+            contents: [{ parts: [{ text: filledPrompt }] }],
+          });
+
+          const result =
+            response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          updated[rowIndex] = {
+            ...updated[rowIndex],
+            [column.id]: result,
+          };
+        } catch (error) {
+          console.error(`Error generating for ${column.name}:`, error);
+          updated[rowIndex] = {
+            ...updated[rowIndex],
+            [column.id]: "[Error]",
+          };
+        }
+
+        setData([...updated]);
+
+        const percent = Math.round(((rowIndex + 1) / data.length) * 100);
+        setProgress(percent);
       }
 
-      setData([...updated]);
-
-      // ✅ update progress
-      const percent = Math.round(((rowIndex + 1) / data.length) * 100);
-      setProgress(percent);
-    }
-
-    setGenerating(false);
-    setTimeout(() => setProgress(null), 2000); // hide bar after 2s
-  };
+      setGenerating(false);
+      setCancelRequested(false);
+      setTimeout(() => setProgress(null), 2000); // hide bar after 2s
+    },
+    [cancelRequested, data],
+  );
 
   const handleExport = () => {
     // Map generated column ids to their friendly names
@@ -174,6 +183,8 @@ export const Generative = () => {
         fileName={file.name}
         lastModified={file.lastModified}
         handleExport={handleExport}
+        isGenerating={isGenerating}
+        setCancelRequested={setCancelRequested}
       />
 
       <div className="grid grid-cols-5 gap-4">
@@ -227,6 +238,7 @@ export const Generative = () => {
           <div className="space-y-4">
             {promptColumns.map((col) => (
               <PromptColumnCard
+                key={col.id}
                 col={col}
                 setPromptColumns={setPromptColumns}
                 isGenerating={isGenerating}
