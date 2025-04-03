@@ -9,17 +9,12 @@ interface HeadingProps {
   lastModified: number
   handleExport: () => void
   isGenerating: boolean
-  setCancelRequested: Dispatch<SetStateAction<boolean>>
+  handleCancel: () => void
 }
 
 export const Heading = (props: HeadingProps) => {
-  const {
-    fileName,
-    lastModified,
-    handleExport,
-    isGenerating,
-    setCancelRequested,
-  } = props
+  const { fileName, lastModified, handleExport, isGenerating, handleCancel } =
+    props
 
   return (
     <div className="flex items-center justify-between gap-8">
@@ -44,10 +39,7 @@ export const Heading = (props: HeadingProps) => {
 
       <div className="flex items-center gap-2">
         {isGenerating ? (
-          <Button
-            onClick={() => setCancelRequested(true)}
-            variant="destructive"
-          >
+          <Button onClick={handleCancel} variant="destructive">
             <Pause className="size-4" />
           </Button>
         ) : null}

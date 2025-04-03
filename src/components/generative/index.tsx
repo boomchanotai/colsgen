@@ -1,25 +1,14 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { formatBytes } from "@/lib/utils"
 import { useFileStore } from "@/stores/file"
 import { PromptColumn } from "@/types"
 import axios from "axios"
-import {
-  Container,
-  KeyRound,
-  LoaderCircle,
-  Package,
-  Rows3,
-  Sparkles,
-} from "lucide-react"
-import { isGenerator } from "motion/react"
+import { Container, KeyRound, Package, Rows3, Sparkles } from "lucide-react"
 import Papa from "papaparse"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
@@ -44,7 +33,7 @@ export const Generative = () => {
   const [isGenerating, setGenerating] = useState(false)
   const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
 
-  const [cancelRequested, setCancelRequested] = useState(false)
+  const cancelRequestedRef = useRef(false)
 
   useEffect(() => {
     if (!file) return
@@ -78,64 +67,71 @@ export const Generative = () => {
     [data]
   )
 
-  const handleGenerateColumn = useCallback(
-    async (column: { id: string; name: string; prompt: string }) => {
-      setGenerating(true)
-      const updated = [...data]
-      const newLoading: { [key: number]: boolean } = {}
+  const handleCancel = () => {
+    cancelRequestedRef.current = true
+  }
 
-      setProgress(0)
+  const handleGenerateColumn = async (column: {
+    id: string
+    name: string
+    prompt: string
+  }) => {
+    setGenerating(true)
+    const updated = [...data]
+    const newLoading: { [key: number]: boolean } = {}
 
-      for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
-        if (cancelRequested) {
-          break
-        }
+    setProgress(0)
 
-        const row = data[rowIndex]
-
-        // ✅ Skip if result already exists
-        if (row[column.id]) {
-          continue
-        }
-
-        newLoading[rowIndex] = true
-
-        const filledPrompt = column.prompt.replace(
-          /{{(.*?)}}/g,
-          (_, key) => row[key.trim()] || ""
-        )
-
-        try {
-          const response = await axios.post(API_URL, {
-            contents: [{ parts: [{ text: filledPrompt }] }],
-          })
-
-          const result =
-            response.data.candidates?.[0]?.content?.parts?.[0]?.text || ""
-          updated[rowIndex] = {
-            ...updated[rowIndex],
-            [column.id]: result,
-          }
-        } catch (error) {
-          console.error(`Error generating for ${column.name}:`, error)
-          updated[rowIndex] = {
-            ...updated[rowIndex],
-            [column.id]: "[Error]",
-          }
-        }
-
-        setData([...updated])
-
-        const percent = Math.round(((rowIndex + 1) / data.length) * 100)
-        setProgress(percent)
+    for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+      if (cancelRequestedRef.current) {
+        break
       }
 
-      setGenerating(false)
-      setCancelRequested(false)
-      setTimeout(() => setProgress(null), 2000) // hide bar after 2s
-    },
-    [cancelRequested, data]
-  )
+      const row = data[rowIndex]
+
+      // ✅ Skip if result already exists
+      if (row[column.id]) {
+        continue
+      }
+
+      newLoading[rowIndex] = true
+
+      const filledPrompt = column.prompt.replace(
+        /{{(.*?)}}/g,
+        (_, key) => row[key.trim()] || ""
+      )
+
+      try {
+        const response = await axios.post(API_URL, {
+          contents: [{ parts: [{ text: filledPrompt }] }],
+        })
+
+        const result =
+          response.data.candidates?.[0]?.content?.parts?.[0]?.text || ""
+        updated[rowIndex] = {
+          ...updated[rowIndex],
+          [column.id]: result,
+        }
+      } catch (error) {
+        console.error(`Error generating for ${column.name}:`, error)
+        updated[rowIndex] = {
+          ...updated[rowIndex],
+          [column.id]: "[Error]",
+        }
+      }
+
+      setData([...updated])
+
+      const percent = Math.round(((rowIndex + 1) / data.length) * 100)
+      setProgress(percent)
+    }
+
+    setGenerating(false)
+    cancelRequestedRef.current = false
+    setTimeout(() => setProgress(null), 2000) // hide bar after 2s
+
+    toast.success("Successfully generated!")
+  }
 
   const handleExport = () => {
     // Map generated column ids to their friendly names
@@ -187,7 +183,7 @@ export const Generative = () => {
         lastModified={file.lastModified}
         handleExport={handleExport}
         isGenerating={isGenerating}
-        setCancelRequested={setCancelRequested}
+        handleCancel={handleCancel}
       />
 
       <div className="grid grid-cols-5 gap-4">
