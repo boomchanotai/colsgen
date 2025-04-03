@@ -1,38 +1,40 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { useFileStore } from "@/stores/file";
-import { redirect } from "next/navigation";
-import { ChangeEvent, useRef } from "react";
-import { toast } from "sonner";
+import { ChangeEvent, useRef } from "react"
+
+import { useFileStore } from "@/stores/file"
+import { redirect } from "next/navigation"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
 
 export const UploadCsv = () => {
-  const { setFile } = useFileStore();
+  const { setFile } = useFileStore()
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
 
-    if (!file) return;
+    if (!file) return
 
     if (file.type !== "text/csv") {
-      toast.error("Invalid file type. Please upload a CSV file.");
-      return;
+      toast.error("Invalid file type. Please upload a CSV file.")
+      return
     }
 
-    setFile(file);
-    redirect("/generative");
-  };
+    setFile(file)
+    redirect("/generative")
+  }
 
   return (
     <>
       <Button
         onClick={() => inputRef.current?.click()}
         size={"lg"}
-        className="text-2xl h-auto py-3 px-12"
+        className="h-auto px-12 py-3 text-2xl"
       >
         Upload CSV
       </Button>
@@ -44,5 +46,5 @@ export const UploadCsv = () => {
         onChange={handleUpload}
       />
     </>
-  );
-};
+  )
+}

@@ -1,15 +1,16 @@
-import { Container } from "@/components/common/container";
-import { Button } from "@/components/ui/button";
-import { UploadCsv } from "./upload-csv";
+import { Container } from "@/components/common/container"
+import { Button } from "@/components/ui/button"
+
+import { UploadCsv } from "./upload-csv"
 
 export const Hero = () => {
   return (
     <div className="relative">
-      <Container className="py-8 space-y-12 ">
+      <Container className="space-y-12 py-8">
         <div className="space-y-2 text-center">
-          <p className="font-medium text-xl">Generate 1,000 rows of </p>
+          <p className="text-xl font-medium">Generate 1,000 rows of </p>
           <h1 className="text-2xl font-semibold">
-            <span className="text-transparent text-5xl bg-clip-text font-extrabold bg-gradient-to-br from-[#4158D0] via-[#C850C0] to-[#FFCC70]">
+            <span className="bg-gradient-to-br from-[#4158D0] via-[#C850C0] to-[#FFCC70] bg-clip-text text-5xl font-extrabold text-transparent">
               AI content
             </span>{" "}
             <span className="text-nowrap">in seconds.</span>
@@ -18,7 +19,7 @@ export const Hero = () => {
             Upload your CSV. Write your prompt. Export magic.
           </p>
         </div>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center">
           <UploadCsv />
         </div>
         <div
@@ -35,5 +36,5 @@ export const Hero = () => {
         </div>
       </Container>
     </div>
-  );
-};
+  )
+}

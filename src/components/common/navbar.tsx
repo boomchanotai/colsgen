@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import Link from "next/link"
+
+import { Button } from "@/components/ui/button"
 
 export const Navbar = () => {
   return (
-    <div className="px-8 py-4 flex justify-between items-center gap-4">
-      <h2 className="text-primary font-bold text-lg">
+    <div className="flex items-center justify-between gap-4 px-8 py-4">
+      <h2 className="text-primary text-lg font-bold">
         <Link href="/">Generative Columns</Link>
       </h2>
       <div>
         <Button>Login</Button>
       </div>
     </div>
-  );
-};
+  )
+}

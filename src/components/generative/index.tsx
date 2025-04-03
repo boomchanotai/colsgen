@@ -1,6 +1,11 @@
-"use client";
+"use client"
 
-import { useFileStore } from "@/stores/file";
+import { useCallback, useEffect, useState } from "react"
+
+import { formatBytes } from "@/lib/utils"
+import { useFileStore } from "@/stores/file"
+import { PromptColumn } from "@/types"
+import axios from "axios"
 import {
   Container,
   KeyRound,
@@ -8,177 +13,175 @@ import {
   Package,
   Rows3,
   Sparkles,
-} from "lucide-react";
-import { SetStateAction, useCallback, useEffect, useState } from "react";
-import Papa from "papaparse";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import axios from "axios";
-import { PromptColumn } from "@/types";
-import { DataTable } from "./components/data-table";
-import { ProgressBar } from "./components/progress-bar";
-import { Heading } from "./components/heading";
-import { InformationBox } from "./components/information-box";
-import { formatBytes } from "@/lib/utils";
-import { AddColumnDialog } from "./components/add-column-dialog";
-import { PromptColumnCard } from "./components/prompt-column-card";
-import LoadingDots from "./components/animate";
-import { isGenerator } from "motion/react";
+} from "lucide-react"
+import { isGenerator } from "motion/react"
+import Papa from "papaparse"
 
-const limit = 5;
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-const API_KEY = "AIzaSyAxRz8_cMyLzPvSkhH5v4RyhEd_cPWmhYo";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+import { AddColumnDialog } from "./components/add-column-dialog"
+import LoadingDots from "./components/animate"
+import { DataTable } from "./components/data-table"
+import { Heading } from "./components/heading"
+import { InformationBox } from "./components/information-box"
+import { ProgressBar } from "./components/progress-bar"
+import { PromptColumnCard } from "./components/prompt-column-card"
+
+const limit = 5
+
+const API_KEY = "AIzaSyAxRz8_cMyLzPvSkhH5v4RyhEd_cPWmhYo"
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`
 
 export const Generative = () => {
-  const { file } = useFileStore();
+  const { file } = useFileStore()
 
-  const [totalRows, setTotalRows] = useState(0);
-  const [data, setData] = useState<any[]>([]);
-  const [headers, setHeaders] = useState<string[]>([]);
-  const [progress, setProgress] = useState<number | null>(null);
-  const [isGenerating, setGenerating] = useState(false);
-  const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([]);
+  const [totalRows, setTotalRows] = useState(0)
+  const [data, setData] = useState<any[]>([])
+  const [headers, setHeaders] = useState<string[]>([])
+  const [progress, setProgress] = useState<number | null>(null)
+  const [isGenerating, setGenerating] = useState(false)
+  const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
 
-  const [cancelRequested, setCancelRequested] = useState(false);
+  const [cancelRequested, setCancelRequested] = useState(false)
 
   useEffect(() => {
-    if (!file) return;
+    if (!file) return
 
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: true,
       complete: (results: Papa.ParseResult<unknown>) => {
-        setTotalRows(results.data.length);
-        setData(results.data.slice(0, limit));
-        setHeaders(Object.keys(results.data[0] || {}));
+        setTotalRows(results.data.length)
+        setData(results.data.slice(0, limit))
+        setHeaders(Object.keys(results.data[0] || {}))
       },
-    });
-  }, [file]);
+    })
+  }, [file])
 
   const handleRemoveColumn = useCallback(
     (colToRemove: string) => {
       // Remove column header
-      const updatedHeaders = headers.filter((h) => h !== colToRemove);
-      setHeaders(updatedHeaders);
+      const updatedHeaders = headers.filter((h) => h !== colToRemove)
+      setHeaders(updatedHeaders)
 
       // Remove column data from each row
       const updatedData = data.map((row) => {
-        const newRow = { ...row };
-        delete newRow[colToRemove];
-        return newRow;
-      });
-      setData(updatedData);
+        const newRow = { ...row }
+        delete newRow[colToRemove]
+        return newRow
+      })
+      setData(updatedData)
     },
-    [data],
-  );
+    [data]
+  )
 
   const handleGenerateColumn = useCallback(
     async (column: { id: string; name: string; prompt: string }) => {
-      setGenerating(true);
-      const updated = [...data];
-      const newLoading: { [key: number]: boolean } = {};
+      setGenerating(true)
+      const updated = [...data]
+      const newLoading: { [key: number]: boolean } = {}
 
-      setProgress(0);
+      setProgress(0)
 
       for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
         if (cancelRequested) {
-          break;
+          break
         }
 
-        const row = data[rowIndex];
+        const row = data[rowIndex]
 
         // ✅ Skip if result already exists
         if (row[column.id]) {
-          continue;
+          continue
         }
 
-        newLoading[rowIndex] = true;
+        newLoading[rowIndex] = true
 
         const filledPrompt = column.prompt.replace(
           /{{(.*?)}}/g,
-          (_, key) => row[key.trim()] || "",
-        );
+          (_, key) => row[key.trim()] || ""
+        )
 
         try {
           const response = await axios.post(API_URL, {
             contents: [{ parts: [{ text: filledPrompt }] }],
-          });
+          })
 
           const result =
-            response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            response.data.candidates?.[0]?.content?.parts?.[0]?.text || ""
           updated[rowIndex] = {
             ...updated[rowIndex],
             [column.id]: result,
-          };
+          }
         } catch (error) {
-          console.error(`Error generating for ${column.name}:`, error);
+          console.error(`Error generating for ${column.name}:`, error)
           updated[rowIndex] = {
             ...updated[rowIndex],
             [column.id]: "[Error]",
-          };
+          }
         }
 
-        setData([...updated]);
+        setData([...updated])
 
-        const percent = Math.round(((rowIndex + 1) / data.length) * 100);
-        setProgress(percent);
+        const percent = Math.round(((rowIndex + 1) / data.length) * 100)
+        setProgress(percent)
       }
 
-      setGenerating(false);
-      setCancelRequested(false);
-      setTimeout(() => setProgress(null), 2000); // hide bar after 2s
+      setGenerating(false)
+      setCancelRequested(false)
+      setTimeout(() => setProgress(null), 2000) // hide bar after 2s
     },
-    [cancelRequested, data],
-  );
+    [cancelRequested, data]
+  )
 
   const handleExport = () => {
     // Map generated column ids to their friendly names
-    const colIdToName: Record<string, string> = {};
+    const colIdToName: Record<string, string> = {}
     for (const col of promptColumns) {
-      colIdToName[col.id] = col.name;
+      colIdToName[col.id] = col.name
     }
 
     // Build export rows with renamed keys
     const exportData = data.map((row) => {
-      const newRow: Record<string, unknown> = {};
+      const newRow: Record<string, unknown> = {}
 
       for (const key in row) {
         if (colIdToName[key]) {
           // It's a generated column → use friendly name
-          newRow[colIdToName[key]] = row[key];
+          newRow[colIdToName[key]] = row[key]
         } else {
           // Original column → keep as-is
-          newRow[key] = row[key];
+          newRow[key] = row[key]
         }
       }
 
-      return newRow;
-    });
+      return newRow
+    })
 
-    const csv = Papa.unparse(exportData);
-    const BOM = "\uFEFF"; // UTF-8 Byte Order Mark
-    const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "output.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    const csv = Papa.unparse(exportData)
+    const BOM = "\uFEFF" // UTF-8 Byte Order Mark
+    const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", "output.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   if (!file)
     return (
-      <div className="min-h-96 flex justify-center items-center text-gray-700">
+      <div className="flex min-h-96 items-center justify-center text-gray-700">
         No Selected File
       </div>
-    );
+    )
 
   return (
-    <div className="py-4 space-y-6 px-8">
+    <div className="space-y-6 px-8 py-4">
       <Heading
         fileName={file.name}
         lastModified={file.lastModified}
@@ -224,7 +227,7 @@ export const Generative = () => {
             promptColumns={promptColumns}
           />
           {isGenerating && (
-            <div className="absolute top-0 left-0 size-full bg-white/80 rounded-md flex justify-center items-center">
+            <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80">
               <LoadingDots />
             </div>
           )}
@@ -251,5 +254,5 @@ export const Generative = () => {
 
       {progress ? <ProgressBar progress={progress} /> : null}
     </div>
-  );
-};
+  )
+}

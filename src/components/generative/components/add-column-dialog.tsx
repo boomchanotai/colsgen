@@ -1,4 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { Dispatch, SetStateAction, useCallback, useState } from "react"
+
+import { PromptColumn } from "@/types"
+import { Plus } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -7,40 +12,37 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { PromptColumn } from "@/types";
-import { Plus } from "lucide-react";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 interface AddColumnDialogProps {
-  setPromptColumns: Dispatch<SetStateAction<PromptColumn[]>>;
+  setPromptColumns: Dispatch<SetStateAction<PromptColumn[]>>
 }
 
 export const AddColumnDialog = (props: AddColumnDialogProps) => {
-  const { setPromptColumns } = props;
+  const { setPromptColumns } = props
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
-  const [colName, setColName] = useState("");
+  const [colName, setColName] = useState("")
 
   const handleAddColumn = useCallback(
     (e: React.SyntheticEvent<HTMLFormElement>) => {
-      e.preventDefault();
+      e.preventDefault()
 
-      if (!colName) return;
+      if (!colName) return
 
       const newColumn: PromptColumn = {
         id: `col_${Date.now()}`,
         name: colName,
         prompt: "",
-      };
-      setPromptColumns((prev: PromptColumn[]) => [...prev, newColumn]);
-      setColName("");
-      setOpen(false);
+      }
+      setPromptColumns((prev: PromptColumn[]) => [...prev, newColumn])
+      setColName("")
+      setOpen(false)
     },
-    [colName],
-  );
+    [colName]
+  )
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,5 +73,5 @@ export const AddColumnDialog = (props: AddColumnDialogProps) => {
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

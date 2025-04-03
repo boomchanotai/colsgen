@@ -1,5 +1,5 @@
-import { Generative } from "@/components/generative";
+import { Generative } from "@/components/generative"
 
 export default function GenerativePage() {
-  return <Generative />;
+  return <Generative />
 }
