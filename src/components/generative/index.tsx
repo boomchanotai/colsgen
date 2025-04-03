@@ -1,30 +1,27 @@
 "use client";
 
-import { Container } from "@/components/common/container";
 import { useFileStore } from "@/stores/file";
-import { File, LoaderCircle } from "lucide-react";
+import {
+  Container,
+  KeyRound,
+  LoaderCircle,
+  Package,
+  Rows3,
+  Sparkles,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Papa from "papaparse";
 import { Column } from "./components/column";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { PromptColumn } from "@/types";
+import { DataTable } from "./components/data-table";
+import { ProgressBar } from "./components/progress-bar";
+import { Heading } from "./components/heading";
+import { InformationBox } from "./components/information-box";
+import { formatBytes } from "@/lib/utils";
 
 const limit = 100;
 
@@ -38,22 +35,12 @@ export const Generative = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const [progress, setProgress] = useState<number | null>(null);
 
   const [isGenerating, setGenerating] = useState(false);
 
-  const [promptColumns, setPromptColumns] = useState<
-    { id: string; name: string; prompt: string }[]
-  >([]);
-
-  const rowsPerPage = 20;
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const currentData = data.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage,
-  );
+  const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([]);
 
   useEffect(() => {
     if (!file) return;
@@ -66,7 +53,6 @@ export const Generative = () => {
         setTotalRows(results.data.length);
         setData(results.data.slice(0, limit));
         setHeaders(Object.keys(results.data[0] || {}));
-        setCurrentPage(1);
       },
     });
   }, [file]);
@@ -87,14 +73,6 @@ export const Generative = () => {
     },
     [data],
   );
-
-  const handlePrevious = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
 
   const handleAddColumn = useCallback(
     (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -207,109 +185,51 @@ export const Generative = () => {
     );
 
   return (
-    <Container className="py-4 space-y-6">
-      <div className="flex gap-8 items-center">
-        <div>
-          <div className="rounded-lg border-primary border px-8 py-4 flex gap-8 items-center min-w-64 justify-between">
-            <div>
-              <h2 className="font-semibold text-lg max-w-48 line-clamp-1">
-                {file.name}
-              </h2>
-              <div className="text-xs text-gray-600 flex gap-2 items-center">
-                <p>
-                  {data.length} / {totalRows} rows
-                </p>
-                <p>•</p>
-                <p>CSV</p>
-              </div>
-            </div>
-            <div className="text-primary">
-              <File className="size-6" />
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 space-y-2">
-          <div className="flex flex-wrap gap-4">
-            {headers.map((header) => (
-              <Column
-                key={header}
-                name={header}
-                onRemove={() => handleRemoveColumn(header)}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="py-4 space-y-6 px-8">
+      <Heading
+        fileName={file.name}
+        lastModified={file.lastModified}
+        handleExport={handleExport}
+      />
+
+      <div className="grid grid-cols-5 gap-4">
+        <InformationBox
+          icon={<Container className="size-4" />}
+          title="File Size"
+          description={formatBytes(file.size)}
+        />
+        <InformationBox
+          icon={<Rows3 className="size-4" />}
+          title="Data"
+          description={`${totalRows} rows, ${headers.length} columns`}
+        />
+        <InformationBox
+          icon={<Sparkles className="size-4" />}
+          title="Generative Columns"
+          description={`${promptColumns.length} columns`}
+        />
+        <InformationBox
+          icon={<Package className="size-4" />}
+          title="Model"
+          description="Gemini 2.0 Flash"
+        />
+        <InformationBox
+          icon={<KeyRound className="size-4" />}
+          title="API Key"
+          description="Activated"
+        />
       </div>
 
       {/* Body */}
       <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-8 border border-primary rounded-md px-6 py-4">
-          {progress !== null && (
-            <div className="w-full max-w-xl mx-auto">
-              <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <div className="text-center mt-1 text-sm text-muted-foreground">
-                {progress < 100 ? `Generating... ${progress}%` : "Done!"}
-              </div>
-            </div>
-          )}
-          <div className="flex justify-end">
-            <Button size="sm" onClick={handleExport} className="cursor-pointer">
-              Export as CSV
-            </Button>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {headers.map((header) => (
-                  <TableHead key={header}>{header}</TableHead>
-                ))}
-                {promptColumns.map((col) => (
-                  <TableHead key={col.id}>{col.name}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((row, rowIdx) => (
-                <TableRow key={rowIdx}>
-                  {headers.map((header) => (
-                    <TableCell key={header}>{row[header]}</TableCell>
-                  ))}
-                  {promptColumns.map((col) => (
-                    <TableCell key={col.id}>
-                      <pre>{row[col.id] || "-"}</pre>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <Pagination className="mt-4 justify-center">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={handlePrevious}
-                  className="cursor-pointer"
-                />
-              </PaginationItem>
-              <PaginationItem className="px-4 py-2 text-xs">
-                Page {currentPage} of {totalPages}
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  onClick={handleNext}
-                  className="cursor-pointer"
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+        <div className="col-span-8">
+          <DataTable
+            data={data}
+            headers={headers}
+            promptColumns={promptColumns}
+          />
         </div>
-        <div className="col-span-4 border border-primary rounded-md flex flex-col px-6 py-4 gap-4">
+        <div className="col-span-4 flex flex-col px-6 py-4 gap-4">
           <div className="flex-1 space-y-4">
             {promptColumns.map((col, idx) => (
               <div
@@ -354,18 +274,7 @@ export const Generative = () => {
         </div>
       </div>
 
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
-      >
-        <div
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-          className="mx-auto aspect-1155/678 w-[72.1875rem] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
-        />
-      </div>
-    </Container>
+      {progress && <ProgressBar progress={progress} />}
+    </div>
   );
 };
