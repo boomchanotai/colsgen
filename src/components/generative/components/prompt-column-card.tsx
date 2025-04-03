@@ -8,13 +8,14 @@ import { Label } from "@/components/ui/label"
 
 interface PromptColumnCardProps {
   col: PromptColumn
-  setPromptColumns: Dispatch<SetStateAction<PromptColumn[]>>
+  handleSetColumnPrompt: (id: string, value: string) => void
   isGenerating: boolean
   handleGenerateColumn: (col: PromptColumn) => void
 }
 
 export const PromptColumnCard = (props: PromptColumnCardProps) => {
-  const { col, setPromptColumns, isGenerating, handleGenerateColumn } = props
+  const { col, handleSetColumnPrompt, isGenerating, handleGenerateColumn } =
+    props
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -33,11 +34,7 @@ export const PromptColumnCard = (props: PromptColumnCardProps) => {
         value={col.prompt}
         onChange={(e) => {
           const value = e.target.value
-          setPromptColumns((prev) =>
-            prev.map((column) =>
-              column.id === col.id ? { ...column, prompt: value } : column
-            )
-          )
+          handleSetColumnPrompt(col.id, value)
         }}
         placeholder="prompt"
         required

@@ -1,15 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-
 import { formatBytes } from "@/lib/utils"
 import { useApiKeyStore } from "@/stores/api-key"
-import { useFileStore } from "@/stores/file"
-import { PromptColumn } from "@/types"
-import axios from "axios"
 import { Container, KeyRound, Package, Rows3, Sparkles } from "lucide-react"
-import Papa from "papaparse"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
@@ -22,156 +15,25 @@ import { InformationBox } from "./components/information-box"
 import { ProgressBar } from "./components/progress-bar"
 import { PromptColumnCard } from "./components/prompt-column-card"
 import { SetApiKeyDialog } from "./components/set-api-key-dialog"
-
-const limit = 5
-
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
+import { useData } from "./hooks/useData"
 
 export const Generative = () => {
-  const { file } = useFileStore()
   const { apiKey, setOpen: setOpenApiKeyDialog } = useApiKeyStore()
-
-  const [totalRows, setTotalRows] = useState(0)
-  const [data, setData] = useState<any[]>([])
-  const [headers, setHeaders] = useState<string[]>([])
-  const [progress, setProgress] = useState<number | null>(null)
-  const [isGenerating, setGenerating] = useState(false)
-  const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
-
-  const cancelRequestedRef = useRef(false)
-
-  useEffect(() => {
-    if (!file) return
-
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: true,
-      complete: (results: Papa.ParseResult<unknown>) => {
-        setTotalRows(results.data.length)
-        setData(results.data.slice(0, limit))
-        setHeaders(Object.keys(results.data[0] || {}))
-      },
-    })
-  }, [file])
-
-  const handleRemoveColumn = (colToRemove: string) => {
-    // Remove from headers
-    setHeaders((prev) => prev.filter((h) => h !== colToRemove))
-
-    // Remove from promptColumns (if exists)
-    setPromptColumns((prev) => prev.filter((col) => col.id !== colToRemove))
-
-    // Remove from data rows
-    setData((prev) =>
-      prev.map((row) => {
-        const { [colToRemove]: _, ...rest } = row
-        return rest
-      })
-    )
-  }
-
-  const handleCancel = () => {
-    cancelRequestedRef.current = true
-  }
-
-  const handleGenerateColumn = async (column: {
-    id: string
-    name: string
-    prompt: string
-  }) => {
-    setGenerating(true)
-    const updated = [...data]
-    const newLoading: { [key: number]: boolean } = {}
-
-    setProgress(0)
-
-    for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
-      if (cancelRequestedRef.current) {
-        break
-      }
-
-      const row = data[rowIndex]
-
-      // ✅ Skip if result already exists
-      if (row[column.id]) {
-        continue
-      }
-
-      newLoading[rowIndex] = true
-
-      const filledPrompt = column.prompt.replace(
-        /{{(.*?)}}/g,
-        (_, key) => row[key.trim()] || ""
-      )
-
-      try {
-        const response = await axios.post(`${API_URL}?key=${apiKey}`, {
-          contents: [{ parts: [{ text: filledPrompt }] }],
-        })
-
-        const result =
-          response.data.candidates?.[0]?.content?.parts?.[0]?.text || ""
-        updated[rowIndex] = {
-          ...updated[rowIndex],
-          [column.id]: result,
-        }
-      } catch (error) {
-        console.error(`Error generating for ${column.name}:`, error)
-        updated[rowIndex] = {
-          ...updated[rowIndex],
-          [column.id]: "[Error]",
-        }
-      }
-
-      setData([...updated])
-
-      const percent = Math.round(((rowIndex + 1) / data.length) * 100)
-      setProgress(percent)
-    }
-
-    setGenerating(false)
-    cancelRequestedRef.current = false
-    setTimeout(() => setProgress(null), 2000) // hide bar after 2s
-
-    toast.success("Successfully generated!")
-  }
-
-  const handleExport = () => {
-    // Map generated column ids to their friendly names
-    const colIdToName: Record<string, string> = {}
-    for (const col of promptColumns) {
-      colIdToName[col.id] = col.name
-    }
-
-    // Build export rows with renamed keys
-    const exportData = data.map((row) => {
-      const newRow: Record<string, unknown> = {}
-
-      for (const key in row) {
-        if (colIdToName[key]) {
-          // It's a generated column → use friendly name
-          newRow[colIdToName[key]] = row[key]
-        } else {
-          // Original column → keep as-is
-          newRow[key] = row[key]
-        }
-      }
-
-      return newRow
-    })
-
-    const csv = Papa.unparse(exportData)
-    const BOM = "\uFEFF" // UTF-8 Byte Order Mark
-    const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute("download", "output.csv")
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+  const {
+    file,
+    data,
+    totalRows,
+    headers,
+    promptColumns,
+    isGenerating,
+    progress,
+    handleAddColumn,
+    handleRemoveColumn,
+    handleSetColumnPrompt,
+    handleGenerateColumn,
+    handleCancelGenerateColumn,
+    handleExport,
+  } = useData()
 
   if (!file)
     return (
@@ -187,7 +49,7 @@ export const Generative = () => {
         lastModified={file.lastModified}
         handleExport={handleExport}
         isGenerating={isGenerating}
-        handleCancel={handleCancel}
+        handleCancel={handleCancelGenerateColumn}
       />
 
       <div className="grid grid-cols-5 gap-4">
@@ -238,17 +100,14 @@ export const Generative = () => {
           {apiKey !== "" ? (
             <>
               <div className="flex justify-end">
-                <AddColumnDialog
-                  setPromptColumns={setPromptColumns}
-                  disabled={apiKey === ""}
-                />
+                <AddColumnDialog handleAddColumn={handleAddColumn} />
               </div>
               <div className="space-y-4">
                 {promptColumns.map((col) => (
                   <PromptColumnCard
                     key={col.id}
                     col={col}
-                    setPromptColumns={setPromptColumns}
+                    handleSetColumnPrompt={handleSetColumnPrompt}
                     isGenerating={isGenerating}
                     handleGenerateColumn={handleGenerateColumn}
                   />

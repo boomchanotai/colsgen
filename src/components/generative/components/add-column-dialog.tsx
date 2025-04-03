@@ -15,29 +15,22 @@ import {
 import { Input } from "@/components/ui/input"
 
 interface AddColumnDialogProps {
-  setPromptColumns: Dispatch<SetStateAction<PromptColumn[]>>
-  disabled: boolean
+  handleAddColumn: (colName: string) => void
 }
 
 export const AddColumnDialog = (props: AddColumnDialogProps) => {
-  const { setPromptColumns, disabled } = props
+  const { handleAddColumn } = props
 
   const [open, setOpen] = useState(false)
 
   const [colName, setColName] = useState("")
 
-  const handleAddColumn = useCallback(
+  const addColumn = useCallback(
     (e: React.SyntheticEvent<HTMLFormElement>) => {
       e.preventDefault()
 
       if (!colName) return
-
-      const newColumn: PromptColumn = {
-        id: `col_${Date.now()}`,
-        name: colName,
-        prompt: "",
-      }
-      setPromptColumns((prev: PromptColumn[]) => [...prev, newColumn])
+      handleAddColumn(colName)
       setColName("")
       setOpen(false)
     },
@@ -47,13 +40,13 @@ export const AddColumnDialog = (props: AddColumnDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2" disabled={disabled}>
+        <Button className="gap-2">
           <Plus className="size-4" />
           <span>Add Column</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form className="space-y-4" onSubmit={handleAddColumn}>
+        <form className="space-y-4" onSubmit={addColumn}>
           <DialogHeader>
             <DialogTitle>Add Column</DialogTitle>
           </DialogHeader>
