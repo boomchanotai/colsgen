@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
+import { sleep } from "@/lib/utils"
 import { useApiKeyStore } from "@/stores/api-key"
 import { useFileStore } from "@/stores/file"
 import { PromptColumn } from "@/types"
@@ -7,7 +8,7 @@ import axios from "axios"
 import Papa from "papaparse"
 import { toast } from "sonner"
 
-const LIMIT = 5
+const LIMIT = 100
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
 
 export const useData = () => {
@@ -116,10 +117,15 @@ export const useData = () => {
           [column.id]: result,
         }
       } catch (error) {
-        console.error(`Error generating for ${column.name}:`, error)
-        updated[rowIndex] = {
-          ...updated[rowIndex],
-          [column.id]: "[Error]",
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 429) {
+            console.warn("Rate limited. Waiting 10 seconds before retrying...")
+            await sleep(10000) // longer delay on 429
+            rowIndex-- // retry this row
+            continue
+          }
+        } else {
+          console.error(error)
         }
       }
 

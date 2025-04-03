@@ -1,11 +1,24 @@
 "use client"
 
-import { formatBytes } from "@/lib/utils"
+import { ChangeEvent, useRef } from "react"
+
+import { cn, formatBytes } from "@/lib/utils"
 import { useApiKeyStore } from "@/stores/api-key"
-import { Container, KeyRound, Package, Rows3, Sparkles } from "lucide-react"
+import { useFileStore } from "@/stores/file"
+import {
+  Container as ContainerIcon,
+  File,
+  KeyRound,
+  Package,
+  Rows3,
+  Sparkles,
+} from "lucide-react"
+import { useDropzone } from "react-dropzone"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
+import { Container } from "../common/container"
 import { UploadCsv } from "../home/components/upload-csv"
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
@@ -35,11 +48,85 @@ export const Generative = () => {
     handleExport,
   } = useData()
 
+  const { setFile } = useFileStore()
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (newFiles: File[]) => {
+    if (newFiles.length === 0) {
+      return
+    }
+
+    const file = newFiles[0]
+    if (!file) return
+
+    if (!file.name.endsWith(".csv")) {
+      toast.error("Invalid file format. Please upload an CSV file.")
+      return
+    }
+
+    setFile(file)
+  }
+
+  const { getRootProps, isDragActive } = useDropzone({
+    multiple: false,
+    noClick: true,
+    onDrop: handleFileChange,
+    onDropRejected: (error) => {
+      console.log(error)
+    },
+  })
+
   if (!file)
     return (
-      <div className="flex min-h-96 items-center justify-center text-gray-700">
-        <UploadCsv />
-      </div>
+      <>
+        <Container>
+          <div
+            {...getRootProps()}
+            className={cn(
+              "border-primary flex min-h-72 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 py-8",
+              {
+                "bg-primary/10": isDragActive,
+              }
+            )}
+            onClick={() => inputRef.current?.click()}
+          >
+            <div>
+              <File className="size-8" />
+            </div>
+            <div className="space-y-1 text-center">
+              <p className="text-lg font-medium">Drag & drop your CSV here</p>
+              <p className="text-sm text-gray-400">or click to browse files</p>
+            </div>
+
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
+            >
+              <div
+                style={{
+                  clipPath:
+                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+                }}
+                className="mx-auto aspect-1155/678 w-[72.1875rem] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
+              />
+            </div>
+          </div>
+        </Container>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".csv"
+          className="hidden"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            e.preventDefault()
+            const file = e.target.files?.[0]
+            if (!file) return
+
+            handleFileChange([file])
+          }}
+        />
+      </>
     )
 
   return (
@@ -54,7 +141,7 @@ export const Generative = () => {
 
       <div className="grid grid-cols-5 gap-4">
         <InformationBox
-          icon={<Container className="size-4" />}
+          icon={<ContainerIcon className="size-4" />}
           title="File Size"
           description={formatBytes(file.size)}
         />

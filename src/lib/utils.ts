@@ -26,3 +26,5 @@ export function formatBytes(bytes: number, decimals = 2) {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
+
+export const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
