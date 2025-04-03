@@ -1,8 +1,9 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { formatBytes } from "@/lib/utils"
+import { useApiKeyStore } from "@/stores/api-key"
 import { useFileStore } from "@/stores/file"
 import { PromptColumn } from "@/types"
 import axios from "axios"
@@ -10,8 +11,9 @@ import { Container, KeyRound, Package, Rows3, Sparkles } from "lucide-react"
 import Papa from "papaparse"
 import { toast } from "sonner"
 
+import { Button } from "@/components/ui/button"
+
 import { UploadCsv } from "../home/components/upload-csv"
-import { AddApiKeyDialog } from "./components/add-api-key-dialog"
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
 import { DataTable } from "./components/data-table"
@@ -19,6 +21,7 @@ import { Heading } from "./components/heading"
 import { InformationBox } from "./components/information-box"
 import { ProgressBar } from "./components/progress-bar"
 import { PromptColumnCard } from "./components/prompt-column-card"
+import { SetApiKeyDialog } from "./components/set-api-key-dialog"
 
 const limit = 5
 
@@ -26,6 +29,7 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
 
 export const Generative = () => {
   const { file } = useFileStore()
+  const { apiKey, setOpen: setOpenApiKeyDialog } = useApiKeyStore()
 
   const [totalRows, setTotalRows] = useState(0)
   const [data, setData] = useState<any[]>([])
@@ -33,8 +37,6 @@ export const Generative = () => {
   const [progress, setProgress] = useState<number | null>(null)
   const [isGenerating, setGenerating] = useState(false)
   const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
-
-  const [apiKey, setApiKey] = useState("")
 
   const cancelRequestedRef = useRef(false)
 
@@ -257,15 +259,23 @@ export const Generative = () => {
             <div className="flex min-h-64 flex-1 flex-col items-center justify-center gap-2 rounded-md border bg-white p-2">
               <div className="flex flex-col items-center justify-center gap-1">
                 <KeyRound className="size-6" />
-                <p className="font-medium">Add your Gemini API Key</p>
+                <p className="font-medium">Set your Gemini API Key</p>
               </div>
-              <AddApiKeyDialog setApiKey={setApiKey} />
+              <Button
+                onClick={() => setOpenApiKeyDialog(true)}
+                size="sm"
+                className="gap-2"
+              >
+                <span>Set your API Key</span>
+              </Button>
             </div>
           )}
         </div>
       </div>
 
       {progress ? <ProgressBar progress={progress} /> : null}
+
+      <SetApiKeyDialog />
     </div>
   )
 }

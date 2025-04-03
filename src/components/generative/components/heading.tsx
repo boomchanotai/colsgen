@@ -1,8 +1,16 @@
-import { Dispatch, SetStateAction } from "react"
-
-import { EllipsisVertical, File, Pause, Share2 } from "lucide-react"
+import { useApiKeyStore } from "@/stores/api-key"
+import { useFileStore } from "@/stores/file"
+import { EllipsisVertical, File, Pause } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface HeadingProps {
   fileName: string
@@ -15,6 +23,9 @@ interface HeadingProps {
 export const Heading = (props: HeadingProps) => {
   const { fileName, lastModified, handleExport, isGenerating, handleCancel } =
     props
+
+  const { setOpen: setOpenApiKeyDialog } = useApiKeyStore()
+  const { clearFile } = useFileStore()
 
   return (
     <div className="flex items-center justify-between gap-8">
@@ -44,9 +55,31 @@ export const Heading = (props: HeadingProps) => {
           </Button>
         ) : null}
         <Button onClick={handleExport}>Export as CSV</Button>
-        <Button size="icon" variant="secondary">
-          <EllipsisVertical className="size-4" />
-        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="secondary">
+              <EllipsisVertical className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Gemini</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => setOpenApiKeyDialog(true)}
+              className="cursor-pointer"
+            >
+              Set API Key
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => clearFile()}
+              className="cursor-pointer"
+            >
+              Clear File
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )
