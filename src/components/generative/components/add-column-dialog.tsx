@@ -1,6 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react"
+import { useCallback, useState } from "react"
 
-import { PromptColumn } from "@/types"
 import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -34,7 +33,7 @@ export const AddColumnDialog = (props: AddColumnDialogProps) => {
       setColName("")
       setOpen(false)
     },
-    [colName]
+    [colName, handleAddColumn]
   )
 
   return (

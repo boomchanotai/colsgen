@@ -16,6 +16,7 @@ export const useData = () => {
   const { apiKey } = useApiKeyStore()
 
   // Data State
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any[]>([])
   const [headers, setHeaders] = useState<string[]>([])
   const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
@@ -61,6 +62,7 @@ export const useData = () => {
     // Remove from data rows
     setData((prev) =>
       prev.map((row) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [colToRemove]: _, ...rest } = row
         return rest
       })

@@ -19,7 +19,6 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
 import { Container } from "../common/container"
-import { UploadCsv } from "../home/components/upload-csv"
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
 import { DataTable } from "./components/data-table"
