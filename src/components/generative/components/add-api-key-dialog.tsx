@@ -47,6 +47,7 @@ export const AddApiKeyDialog = (props: AddApiKeyDialog) => {
               className="col-span-3"
               onChange={(e) => setKey(e.target.value)}
               value={key}
+              required
             />
           </div>
 

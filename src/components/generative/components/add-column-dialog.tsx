@@ -64,6 +64,7 @@ export const AddColumnDialog = (props: AddColumnDialogProps) => {
               className="col-span-3"
               onChange={(e) => setColName(e.target.value)}
               value={colName}
+              required
             />
           </div>
 

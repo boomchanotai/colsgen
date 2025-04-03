@@ -1,7 +1,6 @@
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 import { PromptColumn } from "@/types"
-import { LoaderCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,8 +16,18 @@ interface PromptColumnCardProps {
 export const PromptColumnCard = (props: PromptColumnCardProps) => {
   const { col, setPromptColumns, isGenerating, handleGenerateColumn } = props
 
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (isGenerating) return
+
+    handleGenerateColumn(col)
+  }
+
   return (
-    <div className="space-y-4 rounded-md border bg-white/50 p-4">
+    <form
+      className="space-y-4 rounded-md border bg-white/50 p-4"
+      onSubmit={handleSubmit}
+    >
       <Label>Prompt for {col.name}</Label>
       <Input
         value={col.prompt}
@@ -31,15 +40,18 @@ export const PromptColumnCard = (props: PromptColumnCardProps) => {
           )
         }}
         placeholder="prompt"
+        required
       />
-      <Button
-        size="sm"
-        className="w-full gap-2"
-        disabled={isGenerating}
-        onClick={() => handleGenerateColumn(col)}
-      >
-        Generate All for This Column
-      </Button>
-    </div>
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          className="gap-2"
+          disabled={isGenerating}
+          onClick={() => handleGenerateColumn(col)}
+        >
+          Generate Column
+        </Button>
+      </div>
+    </form>
   )
 }
