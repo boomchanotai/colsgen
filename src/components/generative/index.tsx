@@ -139,7 +139,7 @@ export const Generative = () => {
         handleCancel={handleCancelGenerateColumn}
       />
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         <InformationBox
           icon={<ContainerIcon className="size-4" />}
           title="File Size"
@@ -168,7 +168,7 @@ export const Generative = () => {
       </div>
 
       {/* Body */}
-      <div className="flex gap-8">
+      <div className="flex flex-col-reverse gap-4 lg:flex-row lg:gap-8">
         <div className="relative flex-1 overflow-hidden">
           <DataTable
             data={data}
@@ -183,7 +183,7 @@ export const Generative = () => {
           )}
         </div>
 
-        <div className="flex min-w-96 flex-initial flex-col gap-4">
+        <div className="flex w-full flex-initial flex-col gap-4 md:w-auto md:min-w-96">
           {apiKey !== "" ? (
             <>
               <div className="flex justify-end">

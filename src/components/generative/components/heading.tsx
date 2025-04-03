@@ -1,6 +1,6 @@
 import { useApiKeyStore } from "@/stores/api-key"
 import { useFileStore } from "@/stores/file"
-import { EllipsisVertical, File, Pause } from "lucide-react"
+import { Download, EllipsisVertical, File, Pause } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -34,7 +34,7 @@ export const Heading = (props: HeadingProps) => {
           <File className="size-6" />
         </div>
         <div>
-          <h1 className="text-lg font-bold">{fileName}</h1>
+          <h1 className="font-bold md:text-lg">{fileName}</h1>
           <div className="text-xs text-gray-500">
             <p>
               Last Modified at{" "}
@@ -54,7 +54,12 @@ export const Heading = (props: HeadingProps) => {
             <Pause className="size-4" />
           </Button>
         ) : null}
-        <Button onClick={handleExport}>Export as CSV</Button>
+        <Button onClick={handleExport}>
+          <span className="md:hidden">
+            <Download />
+          </span>
+          <span className="hidden md:block">Export as CSV</span>
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
