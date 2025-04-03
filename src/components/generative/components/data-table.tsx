@@ -45,7 +45,7 @@ export const DataTable = (props: DataTableProps) => {
 
   return (
     <div>
-      <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+      <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-md">
         <Table className="min-w-full divide-y divide-gray-200">
           <TableHeader className="bg-gray-50">
             <TableRow>
