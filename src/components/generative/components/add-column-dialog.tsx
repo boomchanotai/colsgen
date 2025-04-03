@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -17,10 +16,11 @@ import { Input } from "@/components/ui/input"
 
 interface AddColumnDialogProps {
   setPromptColumns: Dispatch<SetStateAction<PromptColumn[]>>
+  disabled: boolean
 }
 
 export const AddColumnDialog = (props: AddColumnDialogProps) => {
-  const { setPromptColumns } = props
+  const { setPromptColumns, disabled } = props
 
   const [open, setOpen] = useState(false)
 
@@ -47,7 +47,7 @@ export const AddColumnDialog = (props: AddColumnDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2" disabled={disabled}>
           <Plus className="size-4" />
           <span>Add Column</span>
         </Button>

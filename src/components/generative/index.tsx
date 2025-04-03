@@ -10,6 +10,8 @@ import { Container, KeyRound, Package, Rows3, Sparkles } from "lucide-react"
 import Papa from "papaparse"
 import { toast } from "sonner"
 
+import { UploadCsv } from "../home/components/upload-csv"
+import { AddApiKeyDialog } from "./components/add-api-key-dialog"
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
 import { DataTable } from "./components/data-table"
@@ -20,8 +22,7 @@ import { PromptColumnCard } from "./components/prompt-column-card"
 
 const limit = 5
 
-const API_KEY = "AIzaSyAxRz8_cMyLzPvSkhH5v4RyhEd_cPWmhYo"
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
 
 export const Generative = () => {
   const { file } = useFileStore()
@@ -32,6 +33,8 @@ export const Generative = () => {
   const [progress, setProgress] = useState<number | null>(null)
   const [isGenerating, setGenerating] = useState(false)
   const [promptColumns, setPromptColumns] = useState<PromptColumn[]>([])
+
+  const [apiKey, setApiKey] = useState("")
 
   const cancelRequestedRef = useRef(false)
 
@@ -102,7 +105,7 @@ export const Generative = () => {
       )
 
       try {
-        const response = await axios.post(API_URL, {
+        const response = await axios.post(`${API_URL}?key=${apiKey}`, {
           contents: [{ parts: [{ text: filledPrompt }] }],
         })
 
@@ -172,7 +175,7 @@ export const Generative = () => {
   if (!file)
     return (
       <div className="flex min-h-96 items-center justify-center text-gray-700">
-        No Selected File
+        <UploadCsv />
       </div>
     )
 
@@ -230,21 +233,36 @@ export const Generative = () => {
         </div>
 
         <div className="col-span-4 flex flex-col gap-4">
-          <div className="flex justify-end">
-            <AddColumnDialog setPromptColumns={setPromptColumns} />
-          </div>
-
-          <div className="space-y-4">
-            {promptColumns.map((col) => (
-              <PromptColumnCard
-                key={col.id}
-                col={col}
-                setPromptColumns={setPromptColumns}
-                isGenerating={isGenerating}
-                handleGenerateColumn={handleGenerateColumn}
-              />
-            ))}
-          </div>
+          {apiKey !== "" ? (
+            <>
+              {" "}
+              <div className="flex justify-end">
+                <AddColumnDialog
+                  setPromptColumns={setPromptColumns}
+                  disabled={apiKey === ""}
+                />
+              </div>
+              <div className="space-y-4">
+                {promptColumns.map((col) => (
+                  <PromptColumnCard
+                    key={col.id}
+                    col={col}
+                    setPromptColumns={setPromptColumns}
+                    isGenerating={isGenerating}
+                    handleGenerateColumn={handleGenerateColumn}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex min-h-64 flex-1 flex-col items-center justify-center gap-2 rounded-md border bg-white p-2">
+              <div className="flex flex-col items-center justify-center gap-1">
+                <KeyRound className="size-6" />
+                <p className="font-medium">Add your Gemini API Key</p>
+              </div>
+              <AddApiKeyDialog setApiKey={setApiKey} />
+            </div>
+          )}
         </div>
       </div>
 
