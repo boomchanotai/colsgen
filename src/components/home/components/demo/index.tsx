@@ -1,6 +1,5 @@
+import AugTable from "@/components/common/aug-table"
 import { Container } from "@/components/common/container"
-
-import AugTable from "./aug-table"
 
 export const Demo = () => {
   return (

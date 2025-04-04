@@ -1,6 +1,6 @@
 import { Container } from "@/components/common/container"
 
-import AugTable from "./demo/aug-table"
+import AugTable from "../../common/aug-table"
 import { UploadCsv } from "./upload-csv"
 
 export const Hero = () => {

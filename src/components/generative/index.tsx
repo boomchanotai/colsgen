@@ -1,27 +1,21 @@
 "use client"
 
-import { ChangeEvent, useRef } from "react"
-
-import { cn, formatBytes } from "@/lib/utils"
+import { formatBytes } from "@/lib/utils"
 import { useApiKeyStore } from "@/stores/api-key"
-import { useFileStore } from "@/stores/file"
 import {
   Container as ContainerIcon,
-  File,
   KeyRound,
   Package,
   Rows3,
   Sparkles,
 } from "lucide-react"
-import { useDropzone } from "react-dropzone"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
-import { Container } from "../common/container"
 import { AddColumnDialog } from "./components/add-column-dialog"
 import LoadingDots from "./components/animate"
 import { DataTable } from "./components/data-table"
+import { EmptyState } from "./components/empty-state"
 import { Heading } from "./components/heading"
 import { InformationBox } from "./components/information-box"
 import { ProgressBar } from "./components/progress-bar"
@@ -47,86 +41,9 @@ export const Generative = () => {
     handleExport,
   } = useData()
 
-  const { setFile } = useFileStore()
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleFileChange = (newFiles: File[]) => {
-    if (newFiles.length === 0) {
-      return
-    }
-
-    const file = newFiles[0]
-    if (!file) return
-
-    if (!file.name.endsWith(".csv")) {
-      toast.error("Invalid file format. Please upload an CSV file.")
-      return
-    }
-
-    setFile(file)
+  if (!file) {
+    return <EmptyState />
   }
-
-  const { getRootProps, isDragActive } = useDropzone({
-    multiple: false,
-    noClick: true,
-    onDrop: handleFileChange,
-    onDropRejected: (error) => {
-      console.log(error)
-    },
-  })
-
-  if (!file)
-    return (
-      <>
-        <Container>
-          <div
-            {...getRootProps()}
-            className={cn(
-              "border-primary flex min-h-72 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 py-8",
-              {
-                "bg-primary/10": isDragActive,
-              }
-            )}
-            onClick={() => inputRef.current?.click()}
-          >
-            <div>
-              <File className="size-8" />
-            </div>
-            <div className="space-y-1 text-center">
-              <p className="text-lg font-medium">Drag & drop your CSV here</p>
-              <p className="text-sm text-gray-400">or click to browse files</p>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
-            >
-              <div
-                style={{
-                  clipPath:
-                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-                }}
-                className="mx-auto aspect-1155/678 w-[72.1875rem] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
-              />
-            </div>
-          </div>
-        </Container>
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".csv"
-          className="hidden"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            e.preventDefault()
-            const file = e.target.files?.[0]
-            if (!file) return
-
-            handleFileChange([file])
-          }}
-        />
-      </>
-    )
 
   return (
     <div className="space-y-6 px-8 py-4">
@@ -147,7 +64,7 @@ export const Generative = () => {
         <InformationBox
           icon={<Rows3 className="size-4" />}
           title="Data"
-          description={`${totalRows} rows, ${headers.length} columns`}
+          description={`${totalRows} rows (limit 100), ${headers.length} cols`}
         />
         <InformationBox
           icon={<Sparkles className="size-4" />}
@@ -168,7 +85,10 @@ export const Generative = () => {
 
       {/* Body */}
       <div className="flex flex-col-reverse gap-4 lg:flex-row lg:gap-8">
-        <div className="relative flex-1 overflow-hidden">
+        <div className="relative flex-1 space-y-2 overflow-hidden">
+          <p className="text-right text-xs text-gray-500">
+            **Please note: You can process up to 100 rows per batch.
+          </p>
           <DataTable
             data={data}
             headers={headers}
