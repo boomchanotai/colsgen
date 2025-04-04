@@ -1,4 +1,4 @@
-# colsgen
+# Colsgen
 
 Colsgen lets you generate AI-powered data for your CSV columns. Upload your file, add prompts, and let our tool handle the rest. All processing is done locally in your browser, ensuring privacy. Use your own API key for full control — no sign-up, no limits.
 
