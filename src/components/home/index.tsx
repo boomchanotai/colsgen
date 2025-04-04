@@ -1,11 +1,14 @@
+import { Demo } from "./components/demo"
+import { Features } from "./components/features"
 import { Hero } from "./components/hero"
-import { Pricing } from "./components/pricing"
 
 export const Home = () => {
   return (
-    <div>
+    <div className="space-y-16">
       <Hero />
-      <Pricing />
+      <Features />
+      {/* <Pricing /> */}
+      <Demo />
     </div>
   )
 }

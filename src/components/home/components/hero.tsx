@@ -7,15 +7,15 @@ export const Hero = () => {
     <div className="relative">
       <Container className="space-y-12 py-8">
         <div className="space-y-2 text-center">
-          <p className="text-xl font-medium">Generate 1,000 rows of </p>
+          <p className="text-xl font-medium">Upload your CSV. Add prompts.</p>
           <h1 className="text-2xl font-semibold">
             <span className="bg-gradient-to-br from-[#4158D0] via-[#C850C0] to-[#FFCC70] bg-clip-text text-5xl font-extrabold text-transparent">
-              AI content
+              Generate AI content
             </span>{" "}
-            <span className="text-nowrap">in seconds.</span>
           </h1>
-          <p className="font-medium">
-            Upload your CSV. Write your prompt. Export magic.
+          <p className="text-lg font-medium">instantly. Free forever.</p>
+          <p className="mt-8 font-medium">
+            Upload CSV. Add prompts. Generate with your API key.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center">

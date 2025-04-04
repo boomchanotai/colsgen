@@ -42,10 +42,10 @@ export const Pricing = () => {
     <Container className="py-8">
       <div className="space-y-4 text-center">
         <h2 className="text-primary font-semibold">Pricing</h2>
-        <p className="text-4xl font-semibold tracking-tight text-balance">
+        <p className="text-3xl font-semibold tracking-tight text-balance">
           Simple Pricing for Every Workflow
         </p>
-        <p className="text-lg">
+        <p>
           Start free. Pay only when you need to process more data <br /> or
           unlock background processing.
         </p>

@@ -8,7 +8,8 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Generative Column",
-  description: "Generate your columns as you want",
+  description:
+    "Upload your CSV, write smart prompts, and generate 100s of AI-enhanced rows — in your browser, using your own API key.",
 }
 
 export default function RootLayout({
