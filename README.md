@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# colsgen
 
-## Getting Started
+Colsgen lets you generate AI-powered data for your CSV columns. Upload your file, add prompts, and let our tool handle the rest. All processing is done locally in your browser, ensuring privacy. Use your own API key for full control — no sign-up, no limits.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### How to Use Colsgen
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Upload Your File**
+   Drag and drop your CSV file — we'll automatically detect the columns.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Add Generative Columns**
+   Define new columns where you want AI-generated content.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Add Prompts**
+   Write customized prompts using column placeholders (e.g., `{{column_name}}`).
 
-## Learn More
+4. **Hit "Generate" and Wait**
+   Click the generate button, and let the AI fill your rows. It’s that easy!
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Model We Chose for the Prototype
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+We selected **Gemini 2.0 Flash** for the prototype because it is the most affordable option, allowing users to access it for free. The tool is designed to work with **your own API key**, giving users full control over the costs and usage while ensuring they can access a powerful AI model.
 
-## Deploy on Vercel
+### Privacy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+We don’t store your API key on our servers (in fact, we don’t even have a server). All operations, including API requests, run **locally in your browser**. Your data and API key remain private and are never sent to us.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Monetize
+
+We plan to monetize through a **pay-as-you-go** model. If user feedback is positive, we aim to integrate more powerful AI models and use our own API key to offer users even more advanced and powerful generative tools.
+
+### Feedback
+
+We’d love to hear your thoughts! You can send feedback via Twitter at [@CentosZ3](https://twitter.com/CentosZ3) or open an issue on our [GitHub](https://github.com/boomchanotai/colsgen).

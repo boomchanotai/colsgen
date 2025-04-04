@@ -20,14 +20,14 @@ export const PrivacyPolicy = () => {
           <div className="space-y-1">
             <p>Last updated: April 2025</p>
             <p>
-              Generative Columns {'("we")'} value your privacy and are committed
-              to protecting your personal data. We aim to handle your
-              information responsibly and in accordance with the purposes stated
-              in this policy.
+              Colsgen {'("we")'} value your privacy and are committed to
+              protecting your personal data. We aim to handle your information
+              responsibly and in accordance with the purposes stated in this
+              policy.
             </p>
             <p>
-              By using the Generative Columns website and services, you accept
-              the terms outlined in this Privacy Policy.
+              By using the Colsgen website and services, you accept the terms
+              outlined in this Privacy Policy.
             </p>
           </div>
         </div>
@@ -68,9 +68,9 @@ export const PrivacyPolicy = () => {
           <h3 className="text-lg font-bold">3. Data We Do Not Store</h3>
           <div className="space-y-1 indent-8">
             <p>
-              Generative Columns does not store any personal data or files you
-              upload. All processing is done directly in your browser, and no
-              data is sent to our servers.
+              Colsgen does not store any personal data or files you upload. All
+              processing is done directly in your browser, and no data is sent
+              to our servers.
             </p>
             <p>
               We do not store CSV files or the results you generate. Everything
@@ -130,9 +130,9 @@ export const PrivacyPolicy = () => {
           <h3 className="text-lg font-bold">8. Policy Changes</h3>
           <div className="space-y-1 indent-8">
             <p>
-              Generative Columns reserves the right to modify or update this
-              Privacy Policy at any time without prior notice. We recommend you
-              check this page periodically for any changes.
+              Colsgen reserves the right to modify or update this Privacy Policy
+              at any time without prior notice. We recommend you check this page
+              periodically for any changes.
             </p>
           </div>
         </div>

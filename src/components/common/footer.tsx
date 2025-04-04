@@ -7,7 +7,7 @@ export const Footer = () => {
   return (
     <footer>
       <Container className="flex items-center justify-between gap-4 p-6 text-xs">
-        <div>© 2025 Generative Columns, Inc. All rights reserved.</div>
+        <div>© 2025 Colsgen, Inc. All rights reserved.</div>
         <div className="flex items-center gap-2">
           <div>
             <Link href="/privacy-policy" className="underline">
@@ -15,7 +15,7 @@ export const Footer = () => {
             </Link>
           </div>
           <div>
-            <Link href="https://github.com/boomchanotai/generative-columns">
+            <Link href="https://github.com/boomchanotai/colsgen">
               <Icon icon="mdi:github" className="size-6" />
             </Link>
           </div>
