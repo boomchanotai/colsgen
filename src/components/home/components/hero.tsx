@@ -1,11 +1,12 @@
 import { Container } from "@/components/common/container"
 
+import AugTable from "./demo/aug-table"
 import { UploadCsv } from "./upload-csv"
 
 export const Hero = () => {
   return (
     <div className="relative">
-      <Container className="space-y-12 py-8">
+      <Container className="space-y-12">
         <div className="space-y-2 text-center">
           <p className="text-xl font-medium">Upload your CSV. Add prompts.</p>
           <h1 className="text-2xl font-semibold">
@@ -14,13 +15,19 @@ export const Hero = () => {
             </span>{" "}
           </h1>
           <p className="text-lg font-medium">instantly. Free forever.</p>
-          <p className="mt-8 font-medium">
-            Upload CSV. Add prompts. Generate with your API key.
+          <p className="mt-8">
+            Powerful tools to transform your CSV data with AI prompts, all in
+            your browser.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center">
           <UploadCsv />
         </div>
+
+        <div className="mx-auto w-full md:w-3/4">
+          <AugTable />
+        </div>
+
         <div
           aria-hidden="true"
           className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"

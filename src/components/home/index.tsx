@@ -1,13 +1,14 @@
 import { Demo } from "./components/demo"
-import { Features } from "./components/features"
 import { Hero } from "./components/hero"
+import { Privacy } from "./components/privacy"
+import { Steps } from "./components/steps"
 
 export const Home = () => {
   return (
-    <div className="space-y-16">
+    <div className="space-y-16 py-8">
       <Hero />
-      <Features />
-      {/* <Pricing /> */}
+      <Steps />
+      <Privacy />
       <Demo />
     </div>
   )
