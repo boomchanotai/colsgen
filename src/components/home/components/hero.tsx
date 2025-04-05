@@ -16,8 +16,8 @@ export const Hero = () => {
           </h1>
           <p className="text-lg font-medium">instantly. Free forever.</p>
           <p className="mt-8">
-            Powerful tools to transform your CSV data with AI prompts, all in
-            your browser.
+            Colsgen is a browser-based AI CSV generator. Upload your file, write
+            prompts, and generate smart data — all locally using your API key.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center">

@@ -11,9 +11,9 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Colsgen - AI-enhanced rows",
   description:
-    "Upload your CSV, write smart prompts, and generate 100s of AI-enhanced rows — in your browser, using your own API key.",
+    "Upload your CSV, add smart prompts, and generate AI-powered rows in your browser. No sign-up, no storage. Use your own API key for fast, private, flexible generation.",
   keywords:
-    "AI CSV generator, generative AI, CSV automation, AI content generation, CSV data automation, bulk data generation, AI for CSV, data processing AI, generative columns, AI data tool, no-code data generation, CSV data tool, AI-powered CSV generator, CSV content automation, prompt-based data generation, BYOK, Gemini 2.0, OpenAI CSV generator, automate data with AI, AI in browser, local AI processing, AI tool for developers",
+    "prompts, browser, upload, generate, content, AI CSV generator, generative AI, CSV automation, AI content generation, CSV data automation, bulk data generation, AI for CSV, data processing AI, generative columns, AI data tool, no-code data generation, CSV data tool, AI-powered CSV generator, CSV content automation, prompt-based data generation, BYOK, Gemini 2.0, OpenAI CSV generator, automate data with AI, AI in browser, local AI processing, AI tool for developers",
   metadataBase: new URL("https://colsgen.com"),
   robots: {
     index: true,
