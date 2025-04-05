@@ -39,6 +39,7 @@ export const Generative = () => {
     handleGenerateColumn,
     handleCancelGenerateColumn,
     handleExport,
+    validatePrompt,
   } = useData()
 
   if (!file) {
@@ -102,7 +103,7 @@ export const Generative = () => {
           )}
         </div>
 
-        <div className="flex w-full flex-initial flex-col gap-4 md:w-auto md:min-w-96">
+        <div className="flex w-full flex-initial flex-col gap-4 md:w-96">
           {apiKey !== "" ? (
             <>
               <div className="flex justify-end">
@@ -113,6 +114,7 @@ export const Generative = () => {
                   <PromptColumnCard
                     key={col.id}
                     col={col}
+                    validatePrompt={validatePrompt}
                     handleSetColumnPrompt={handleSetColumnPrompt}
                     isGenerating={isGenerating}
                     handleGenerateColumn={handleGenerateColumn}

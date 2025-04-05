@@ -57,7 +57,7 @@ export const DataTable = (props: DataTableProps) => {
               {headers.map((header) => (
                 <TableHead
                   key={header}
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500"
                 >
                   <div className="flex items-center gap-2">
                     <p>{header}</p>
@@ -75,7 +75,7 @@ export const DataTable = (props: DataTableProps) => {
               {promptColumns.map((col) => (
                 <TableHead
                   key={col.id}
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500"
                 >
                   <div className="flex items-center gap-2">
                     <span>{col.name}</span>

@@ -125,6 +125,15 @@ export const useData = () => {
             await sleep(10000) // longer delay on 429
             rowIndex-- // retry this row
             continue
+          } else {
+            toast.error(
+              "Can't request to Gemini. Please re-check your api key."
+            )
+
+            setGenerating(false)
+            cancelRequestedRef.current = false
+            setTimeout(() => setProgress(null), 2000) // hide bar after 2s
+            return
           }
         } else {
           console.error(error)
@@ -184,6 +193,13 @@ export const useData = () => {
     document.body.removeChild(link)
   }
 
+  const validatePrompt = (prompt: string): boolean => {
+    const placeholders = [...prompt.matchAll(/{{(.*?)}}/g)].map((m) =>
+      m[1].trim()
+    )
+    return placeholders.every((key) => headers.includes(key))
+  }
+
   return {
     file,
     data,
@@ -198,5 +214,6 @@ export const useData = () => {
     handleGenerateColumn,
     handleCancelGenerateColumn,
     handleExport,
+    validatePrompt,
   }
 }

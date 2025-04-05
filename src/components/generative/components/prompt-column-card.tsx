@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { PromptColumn } from "@/types"
 import { Info } from "lucide-react"
 
@@ -13,14 +15,22 @@ import {
 
 interface PromptColumnCardProps {
   col: PromptColumn
+  validatePrompt: (text: string) => boolean
   handleSetColumnPrompt: (id: string, value: string) => void
   isGenerating: boolean
   handleGenerateColumn: (col: PromptColumn) => void
 }
 
 export const PromptColumnCard = (props: PromptColumnCardProps) => {
-  const { col, handleSetColumnPrompt, isGenerating, handleGenerateColumn } =
-    props
+  const {
+    col,
+    handleSetColumnPrompt,
+    isGenerating,
+    handleGenerateColumn,
+    validatePrompt,
+  } = props
+
+  const [isPromptValid, setIsPromptValid] = useState(true)
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -47,18 +57,29 @@ export const PromptColumnCard = (props: PromptColumnCardProps) => {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <Input
-        value={col.prompt}
-        onChange={(e) => {
-          const value = e.target.value
-          handleSetColumnPrompt(col.id, value)
-        }}
-        placeholder="generate {{column_name}} description for me"
-        required
-      />
-      <p className="text-xs text-gray-500"></p>
+      <div className="space-y-1">
+        <Input
+          value={col.prompt}
+          onChange={(e) => {
+            const value = e.target.value
+            setIsPromptValid(validatePrompt(value))
+            handleSetColumnPrompt(col.id, value)
+          }}
+          placeholder="generate {{column_name}} description for me"
+          required
+        />
+        <p className="text-xs text-red-500">
+          {!isPromptValid
+            ? "Prompt contains invalid placeholders that don’t match any column name."
+            : null}
+        </p>
+      </div>
       <div className="flex justify-end">
-        <Button type="submit" className="gap-2" disabled={isGenerating}>
+        <Button
+          type="submit"
+          className="gap-2"
+          disabled={isGenerating || !isPromptValid}
+        >
           Generate Column
         </Button>
       </div>

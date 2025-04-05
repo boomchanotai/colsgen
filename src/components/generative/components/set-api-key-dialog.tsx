@@ -55,25 +55,37 @@ export const SetApiKeyDialog = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Input
               placeholder="Gemini API Key"
               className="col-span-3"
               onChange={(e) => setKey(e.target.value)}
               value={key}
               required
+              type="password"
               autoFocus
             />
-            <p className="text-xs text-gray-500">
-              Get your api key at{" "}
-              <Link
-                href="https://aistudio.google.com/apikey"
-                className="underline"
-                target="_blank"
-              >
-                Google AI Studio
-              </Link>
-            </p>
+            <div className="space-y-2 text-xs text-gray-500">
+              <p>
+                Get your api key at{" "}
+                <Link
+                  href="https://aistudio.google.com/apikey"
+                  className="underline"
+                  target="_blank"
+                >
+                  Google AI Studio
+                </Link>
+              </p>
+              <div>
+                {" "}
+                <p>Rate Limit</p>
+                <ul className="list-inside list-disc">
+                  <li>15 Requests per minute</li>
+                  <li>1,500 Requests per day</li>
+                  <li>1,000,000 Tokens per minute</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           <DialogFooter>
