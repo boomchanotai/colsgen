@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 
+import { Analytics } from "@/components/common/analytics"
+import { CookieConsent } from "@/components/common/cookie-consent"
 import { Footer } from "@/components/common/footer"
 import { Navbar } from "@/components/common/navbar"
 import { Toaster } from "@/components/ui/sonner"
@@ -28,6 +30,8 @@ export default function RootLayout({
         </div>
         <Footer />
         <Toaster />
+        <CookieConsent />
+        <Analytics />
       </body>
     </html>
   )
