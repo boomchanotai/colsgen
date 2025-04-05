@@ -121,8 +121,8 @@ export const useData = () => {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 429) {
-            console.warn("Rate limited. Waiting 10 seconds before retrying...")
-            await sleep(60000) // longer delay on 429
+            toast.info("Hit rate limit... wait a minutes!")
+            await sleep(30000) // longer delay on 429, delay 30s
             rowIndex-- // retry this row
             continue
           } else {
