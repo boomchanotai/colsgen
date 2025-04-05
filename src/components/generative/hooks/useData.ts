@@ -122,7 +122,7 @@ export const useData = () => {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 429) {
             console.warn("Rate limited. Waiting 10 seconds before retrying...")
-            await sleep(10000) // longer delay on 429
+            await sleep(60000) // longer delay on 429
             rowIndex-- // retry this row
             continue
           } else {
