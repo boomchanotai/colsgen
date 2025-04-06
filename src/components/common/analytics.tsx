@@ -2,10 +2,15 @@
 
 import { useEffect } from "react"
 
-import { pageview } from "@/lib/gtagHelper"
 import { useCookieStore } from "@/stores/cookie"
 import { usePathname, useSearchParams } from "next/navigation"
 import Script from "next/script"
+
+const pageview = (GA_MEASUREMENT_ID: string, url: string) => {
+  window.gtag("config", GA_MEASUREMENT_ID, {
+    page_path: url,
+  })
+}
 
 export const Analytics = () => {
   const { isConsent } = useCookieStore()
