@@ -12,7 +12,6 @@ export const CookieConsent = () => {
 
   const handleConsent = () => {
     setConsent(true)
-    window.location.reload()
   }
 
   const handleDecline = () => {
