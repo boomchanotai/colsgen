@@ -1,3 +1,5 @@
+import { Suspense } from "react"
+
 import type { Metadata } from "next"
 
 import { Analytics } from "@/components/common/analytics"
@@ -57,7 +59,9 @@ export default function RootLayout({
         <Footer />
         <Toaster />
         <CookieConsent />
-        <Analytics />
+        <Suspense>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   )
