@@ -8,7 +8,7 @@ import axios from "axios"
 import Papa from "papaparse"
 import { toast } from "sonner"
 
-const LIMIT = 100
+const LIMIT = 10000
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
 
 export const useData = () => {
