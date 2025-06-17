@@ -35,6 +35,7 @@ export const Generative = () => {
     progress,
     handleAddColumn,
     handleRemoveColumn,
+    handleChangeNormalColumnToPromptColumn,
     handleSetColumnPrompt,
     handleGenerateColumn,
     handleCancelGenerateColumn,
@@ -95,6 +96,9 @@ export const Generative = () => {
             headers={headers}
             promptColumns={promptColumns}
             handleRemoveColumn={handleRemoveColumn}
+            handleChangeNormalColumnToPromptColumn={
+              handleChangeNormalColumnToPromptColumn
+            }
           />
           {isGenerating && (
             <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80">

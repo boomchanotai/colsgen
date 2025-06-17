@@ -69,6 +69,33 @@ export const useData = () => {
     )
   }
 
+  const handleChangeNormalColumnToPromptColumn = (colName: string) => {
+    const existingColumn = promptColumns.find((col) => col.name === colName)
+    if (existingColumn) {
+      toast.error("This column is already a prompt column.")
+      return
+    }
+
+    const newColumn: PromptColumn = {
+      id: `col_${Date.now()}`,
+      name: colName,
+      prompt: `Generate content based on the value of ${colName}: {{${colName}}}`,
+    }
+
+    setPromptColumns((prev) => [...prev, newColumn])
+    setHeaders((prev) => prev.filter((h) => h !== colName))
+
+    // move data from normal column to prompt column
+    setData((prev) =>
+      prev.map((row) => {
+        return {
+          ...row,
+          [newColumn.id]: row[colName] || "", // Add new column with existing data
+        }
+      })
+    )
+  }
+
   const handleSetColumnPrompt = (id: string, value: string) => {
     setPromptColumns((prev) =>
       prev.map((column) =>
@@ -210,6 +237,7 @@ export const useData = () => {
     progress,
     handleAddColumn,
     handleRemoveColumn,
+    handleChangeNormalColumnToPromptColumn,
     handleSetColumnPrompt,
     handleGenerateColumn,
     handleCancelGenerateColumn,

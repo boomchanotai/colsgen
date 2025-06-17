@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 import { PromptColumn } from "@/types"
-import { Sparkles, X } from "lucide-react"
+import { Sparkle, Sparkles, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,10 +26,17 @@ interface DataTableProps {
   headers: string[]
   promptColumns: PromptColumn[]
   handleRemoveColumn: (id: string) => void
+  handleChangeNormalColumnToPromptColumn: (colName: string) => void
 }
 
 export const DataTable = (props: DataTableProps) => {
-  const { data, headers, promptColumns, handleRemoveColumn } = props
+  const {
+    data,
+    headers,
+    promptColumns,
+    handleRemoveColumn,
+    handleChangeNormalColumnToPromptColumn,
+  } = props
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -61,6 +68,16 @@ export const DataTable = (props: DataTableProps) => {
                 >
                   <div className="flex items-center gap-2">
                     <p>{header}</p>
+                    <Button
+                      size="icon"
+                      className="size-auto rounded"
+                      variant="ghost"
+                      onClick={() =>
+                        handleChangeNormalColumnToPromptColumn(header)
+                      }
+                    >
+                      <Sparkle className="size-4" />
+                    </Button>
                     <Button
                       size="icon"
                       className="size-auto rounded"
