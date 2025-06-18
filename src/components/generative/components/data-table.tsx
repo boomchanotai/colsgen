@@ -27,6 +27,11 @@ interface DataTableProps {
   promptColumns: PromptColumn[]
   handleRemoveColumn: (id: string) => void
   handleChangeNormalColumnToPromptColumn: (colName: string) => void
+  handleRemoveDataInRowColumn: (
+    type: "normal" | "prompt",
+    row: number,
+    id: string
+  ) => void
 }
 
 export const DataTable = (props: DataTableProps) => {
@@ -36,6 +41,7 @@ export const DataTable = (props: DataTableProps) => {
     promptColumns,
     handleRemoveColumn,
     handleChangeNormalColumnToPromptColumn,
+    handleRemoveDataInRowColumn,
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -119,17 +125,41 @@ export const DataTable = (props: DataTableProps) => {
                 {headers.map((header) => (
                   <TableCell
                     key={header}
-                    className="max-w-96 truncate px-6 py-4 text-sm whitespace-nowrap text-gray-900"
+                    className="max-w-96 px-6 py-4 text-sm whitespace-nowrap text-gray-900"
                   >
-                    {row[header]}
+                    <div className="flex items-center gap-2">
+                      <div className="truncate">{row[header] || "-"}</div>
+                      <Button
+                        size="icon"
+                        className="size-auto rounded text-gray-400"
+                        variant="ghost"
+                        onClick={() =>
+                          handleRemoveDataInRowColumn("normal", rowIdx, header)
+                        }
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 ))}
                 {promptColumns.map((col) => (
                   <TableCell
                     key={col.id}
-                    className="max-w-96 truncate px-6 py-4 text-sm whitespace-nowrap text-gray-900"
+                    className="max-w-96 px-6 py-4 text-sm whitespace-nowrap text-gray-900"
                   >
-                    {row[col.id] || "-"}
+                    <div className="flex items-center gap-2">
+                      <div className="truncate">{row[col.id] || "-"}</div>
+                      <Button
+                        size="icon"
+                        className="size-auto rounded text-gray-400"
+                        variant="ghost"
+                        onClick={() =>
+                          handleRemoveDataInRowColumn("prompt", rowIdx, col.id)
+                        }
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 ))}
               </TableRow>

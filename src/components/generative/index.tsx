@@ -41,6 +41,7 @@ export const Generative = () => {
     handleCancelGenerateColumn,
     handleExport,
     validatePrompt,
+    handleRemoveDataInRowColumn,
   } = useData()
 
   if (!file) {
@@ -99,6 +100,7 @@ export const Generative = () => {
             handleChangeNormalColumnToPromptColumn={
               handleChangeNormalColumnToPromptColumn
             }
+            handleRemoveDataInRowColumn={handleRemoveDataInRowColumn}
           />
           {isGenerating && (
             <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80">

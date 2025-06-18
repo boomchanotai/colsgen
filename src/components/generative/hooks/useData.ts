@@ -96,6 +96,27 @@ export const useData = () => {
     )
   }
 
+  const handleRemoveDataInRowColumn = (
+    type: "normal" | "prompt",
+    row: number,
+    id: string
+  ) => {
+    setData((prev) =>
+      prev.map((r, index) => {
+        if (index === row) {
+          if (type === "normal") {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [id]: _, ...rest } = r // Remove normal column data
+            return rest
+          } else {
+            return { ...r, [id]: "" } // Clear prompt column data
+          }
+        }
+        return r
+      })
+    )
+  }
+
   const handleSetColumnPrompt = (id: string, value: string) => {
     setPromptColumns((prev) =>
       prev.map((column) =>
@@ -243,5 +264,6 @@ export const useData = () => {
     handleCancelGenerateColumn,
     handleExport,
     validatePrompt,
+    handleRemoveDataInRowColumn,
   }
 }
